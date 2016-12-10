@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Singa mobile</string>
-    <string name="ApplicationName">SingaMobile</string>
+  <string name="app_name">Singa</string>
+
+  <string name="navigation_drawer_open">Open navigation drawer</string>
+  <string name="navigation_drawer_close">Close navigation drawer</string>
+
+  <string name="action_settings">Настройки</string>
+
+  <string name="nav_menu_profiles">Профили</string>
+  <string name="nav_menu_messages">Сообщения</string>
+  <string name="nav_menu_groups">Группы</string>
+  <string name="nav_menu_settings">Настройки</string>
 </resources>
