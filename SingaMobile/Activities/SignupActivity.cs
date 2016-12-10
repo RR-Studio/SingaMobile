@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
+using SingaMobile.Services;
 
 namespace SingaMobile.Activities
 {
@@ -42,15 +44,14 @@ namespace SingaMobile.Activities
             OverridePendingTransition(Resource.Animation.push_left_in, Resource.Animation.push_left_out);
         }
 
-        private void SignUp(object sender, System.EventArgs e)
+        private async void SignUp(object sender, System.EventArgs e)
         {
+            _signupButton.Enabled = false;
             if (!IsInputValid())
             {
-                OnSignupFailed();
+                OnSignupFailed("Typed data is not valid");
                 return;
             }
-
-            _signupButton.Enabled = false;
 
             var progressDialog = new ProgressDialog(this, Resource.Style.AppTheme_Dark_Dialog);
             progressDialog.Indeterminate = true;
@@ -60,11 +61,17 @@ namespace SingaMobile.Activities
             var name = _nameTxt.Text;
             var email = _emailTxt.Text;
             var password = _passwTxt.Text;
-            var reEnterPassword = _passwConfirmTxt.Text;
 
-            // TODO: Sign Up
+            var responseText = await SingaService.Register(email, password);
 
-            OnSignupSuccess();
+            if (responseText == "Created")
+                OnSignupSuccess();
+            else
+            {
+                OnSignupFailed(responseText);
+                progressDialog.Dismiss();
+            }
+            _signupButton.Enabled = true;
         }
 
         private void OnSignupSuccess()
@@ -74,9 +81,9 @@ namespace SingaMobile.Activities
             OverridePendingTransition(Resource.Animation.push_left_in, Resource.Animation.push_left_out);
         }
 
-        private void OnSignupFailed()
+        private void OnSignupFailed(string reasonDescription)
         {
-            Toast.MakeText(ApplicationContext, "Check typed data", ToastLength.Long).Show();
+            Toast.MakeText(ApplicationContext, reasonDescription, ToastLength.Long).Show();
         }
 
         private bool IsInputValid()
@@ -108,9 +115,14 @@ namespace SingaMobile.Activities
                 _emailTxt.Error = null;
             }
 
-            if (string.IsNullOrEmpty(password) || password.Length < 4 || password.Length > 10)
+            if (!(password.Length > 5 && password.Length < 12))
             {
-                _passwTxt.Error = "between 4 and 10 alphanumeric characters";
+                _passwTxt.Error = "length between 5 and 12";
+                valid = false;
+            }
+            else if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$"))
+            {
+                _passwTxt.Error = "at least one upper-case char, digit and symbol";
                 valid = false;
             }
             else
@@ -118,9 +130,9 @@ namespace SingaMobile.Activities
                 _passwTxt.Error = null;
             }
 
-            if (string.IsNullOrEmpty(passwordConfirmation) || passwordConfirmation.Length< 4 || passwordConfirmation.Length> 10 || !(passwordConfirmation.Equals(password)))
+            if (string.IsNullOrEmpty(passwordConfirmation) || !(passwordConfirmation.Equals(password)))
             {
-                _passwConfirmTxt.Error = "Password Do not match";
+                _passwConfirmTxt.Error = "passwords do not match";
                 valid = false;
             }
             else

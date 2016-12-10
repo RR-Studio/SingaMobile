@@ -33,13 +33,13 @@ namespace SingaMobile.Activities
 
         private void Login(object sender, System.EventArgs e)
         {
+            _loginBtn.Enabled = false;
+
             if (!IsInputValid())
             {
                 OnLoginFailed();
                 return;
             }
-
-            _loginBtn.Enabled = false;
 
             var progressDialog = new ProgressDialog(this, Resource.Style.AppTheme_Dark_Dialog);
             progressDialog.Indeterminate = true;
@@ -58,8 +58,7 @@ namespace SingaMobile.Activities
                 progressDialog.Dismiss();
             }, 3000);
 
-
-
+            _loginBtn.Enabled = true;
         }
 
         private void OnLoginSuccess()
